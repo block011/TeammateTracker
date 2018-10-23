@@ -91,7 +91,7 @@ class userClass:
 		with open(self.get_fileName(),'r') as fp:
 			return json.load(fp)
 
-	def pushtoJSON(self,userJSON):
+	def pushToJSON(self,userJSON):
 
 		#Checking if file already exists
 		if(os.path.isfile(self.get_fileName())):

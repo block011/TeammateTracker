@@ -44,7 +44,7 @@ class userClass:
 		return self.__region
 
 	def get_summonerName(self):
-		return self.__region
+		return self.__summonerName
 
 	def get_apiKey(self):
 		return self.__apiKey
@@ -87,24 +87,31 @@ class userClass:
 		response = requests.get(self.get_matchURL())
 		return response.json()
 
-	def pushtoJSON(userJSON):
+	def getFromJSON(self):
+		with open(self.get_fileName(),'r') as fp:
+			return json.load(fp)
+
+	def pushtoJSON(self,userJSON):
 
 		#Checking if file already exists
 		if(os.path.isfile(self.get_fileName())):
-			oldData = getFromJSON(self.get_fileName())
+			oldData = self.getFromJSON()
 		else:
 			oldData = {}
 
 		#combining the old file and the new data together
-		updatedData = {**oldData, **userJSON}
+		#updatedData = {**oldData, **userJSON}
+
+		for players in userJSON:
+			oldData[players] = userJSON[players]
 
 		with open(self.get_fileName(),'w') as fp:
-			json.dump(updatedData,fp)
+			json.dump(oldData,fp)
 
 	def getParticipants(self):
 
 		now = datetime.datetime.now()
-		currentTime = str(now.strftime("%Y-%m-%d-%S"))
+		currentTime = str(now.strftime("%Y-%m-%d/%H-%S"))
 
 		fullResponse = self.requestMatchData()
 		Participant = {}

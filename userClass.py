@@ -5,13 +5,11 @@ import datetime
 
 class userClass:
 #holds userInformation used to grab from api
-	def __init__(self, region, summonerName, apiKey):
-		updateUser(region, summonerName, apiKey)
-
 
 	#setters
 	def set_region(self,region):
 		self.__region = region
+		
 
 	def set_summonerName(self,summonerName):
 		self.__summonerName = summonerName
@@ -31,12 +29,12 @@ class userClass:
 	
 	def set_summonerId(self, summonerName):
 		#for future check if empty with ID constant
-		response = requestSummonerData()
-		self.__summonerId = str(response['summonerId'])
+		response = self.requestSummonerData()
+		self.__summonerId = str(response['id'])
 
 	def set_fileName(self):
 		#for later : check if all variables are valid
-		filePathName = get_path() + '/' + get_summonerName() + ".json"
+		filePathName = self.get_path() + "/" + self.get_summonerName() + ".json"
 		self.__fileName = filePathName
 
 		
@@ -74,17 +72,30 @@ class userClass:
 		self.__summonerURL = __get_summonerURL(region, summonerName,apiKey)
 		self.__summonerId = set_summonerId(summonerName)
 		self.__matchURL = __set_matchURL(region, get_summonerId(), apiKey)
+
+
 	def requestSummonerData(self):
 		#for later : check if all conditions are met
-		response = requests.get(get_summonerURL())
+		response = requests.get(self.get_summonerURL())
 		return response.json()
 
 	def requestMatchData(self):
 		#for later : check if all conditions are met
-		response = requests.get(get_matchURL())
+		response = requests.get(self.get_matchURL())
 		return response.json()
 
 	#def pushtoJSON()
 
 
+
+
+	def __init__(self, region, summonerName, apiKey):
+		self.set_region(region)
+		self.set_summonerName(summonerName)
+		self.set_apiKey(apiKey)
+		self.set_path("./")
+		self.set_fileName()
+		self.__set_summonerURL(region, summonerName,apiKey)
+		self.set_summonerId(summonerName)
+		self.__set_matchURL(region, self.get_summonerId(), apiKey)
 

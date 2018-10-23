@@ -5,10 +5,11 @@ from userClass import userClass
 
 
 def main():
-	print("Hello World")
-	d = userClass("fsf","sdf","ferg")
+	region = "na1"
+	userName = "afternoonview"
+	apiKey = "RGAPI-343570c7-c17c-4537-939d-9f2e6f34a6f3"
+	user = userClass(region, userName, apiKey)
 
-	print(d.get_apiKey())
 
 
 

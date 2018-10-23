@@ -61,15 +61,18 @@ class userClass:
 	def get_summonerId(self):
 		return self.__summonerId
 
+	def get_fileName(self):
+		return self.__fileName
+
 
 	#functions
 	def updateUser(self, region, summonerName, apiKey):
-		self.__region = set_region(region)
-		self.__summonerName = set_summonerName(summonerName)
-		self.__apiKey = set_apiKey(apiKey)
-		self.__path = set_path('./')
-		self.__fileName = set_fileName()
-		self.__summonerURL = __get_summonerURL(region, summonerName,apiKey)
+		self.set_region(region)
+		self.set_summonerName(summonerName)
+		self.set_apiKey(apiKey)
+		self.set_path('./')
+		self.set_fileName()
+		self.__summonerURL = __set_summonerURL(region, summonerName,apiKey)
 		self.__summonerId = set_summonerId(summonerName)
 		self.__matchURL = __set_matchURL(region, get_summonerId(), apiKey)
 
@@ -84,7 +87,49 @@ class userClass:
 		response = requests.get(self.get_matchURL())
 		return response.json()
 
-	#def pushtoJSON()
+	def pushtoJSON(userJSON):
+
+		#Checking if file already exists
+		if(os.path.isfile(self.get_fileName())):
+			oldData = getFromJSON(self.get_fileName())
+		else:
+			oldData = {}
+
+		#combining the old file and the new data together
+		updatedData = {**oldData, **userJSON}
+
+		with open(self.get_fileName(),'w') as fp:
+			json.dump(updatedData,fp)
+
+	def getParticipants(self):
+
+		now = datetime.datetime.now()
+		currentTime = str(now.strftime("%Y-%m-%d-%S"))
+
+		fullResponse = self.requestMatchData()
+		Participant = {}
+
+		#Cleaning JSON file of useless items
+		#Putting clean JSON into Participant
+		for summoner in fullResponse['participants']:
+			
+			#Does not let bots nor the original user through
+			if(summoner['bot'] == False and str(summoner['summonerId']) != self.get_summonerId()):
+				
+				#saving all the info under the date in which it was pulled
+				Participant[str(summoner['summonerId'])] = {}
+				Participant[str(summoner['summonerId'])][currentTime] = summoner
+
+				#clear JSON of all junk we don't need
+				del Participant[str(summoner['summonerId'])][currentTime]['perks']
+				del Participant[str(summoner['summonerId'])][currentTime]['gameCustomizationObjects']
+				del Participant[str(summoner['summonerId'])][currentTime]['spell1Id']
+				del Participant[str(summoner['summonerId'])][currentTime]['spell2Id']
+				del Participant[str(summoner['summonerId'])][currentTime]['bot']
+				del Participant[str(summoner['summonerId'])][currentTime]['profileIconId']
+				del Participant[str(summoner['summonerId'])][currentTime]['summonerId']
+
+		return Participant
 
 
 

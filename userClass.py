@@ -6,13 +6,8 @@ import datetime
 class userClass:
 #holds userInformation used to grab from api
 	def __init__(self, region, summonerName, apiKey):
-		self.__region = set_region(region)
-		self.__summonerName = set_summonerName(summonerName)
-		self.__apiKey = set_apiKey(apiKey)
-		self.__path = set_path('./')
-		self.__summonerURL = __get_summonerURL(region, summonerName,apiKey)
-		self.__matchURL = None
-		self.__summonerId = None
+		updateUser(region, summonerName, apiKey)
+
 
 	#setters
 	def set_region(self,region):
@@ -31,6 +26,20 @@ class userClass:
 	def __set_summonerURL(self,region, summonerName, apiKey):
 		self.__summonerURL = "https://" + region + ".api.riotgames.com/lol/summoner/v3/summoners/by-name/" + summonerName + "?api_key=" + apiKey
 
+	def __set_matchURL(self, region, summonerId, apikey):
+		self.__matchURL = "https://" + region + ".api.riotgames.com/lol/spectator/v3/active-games/by-summoner/" + summonerId + "?api_key=" + apikey
+	
+	def set_summonerId(self, summonerName):
+		#for future check if empty with ID constant
+		response = requestSummonerData()
+		self.__summonerId = str(response['summonerId'])
+
+	def set_fileName(self):
+		#for later : check if all variables are valid
+		filePathName = get_path() + '/' + get_summonerName() + ".json"
+		self.__fileName = filePathName
+
+		
 
 	#getters
 	def get_region(self):
@@ -51,11 +60,31 @@ class userClass:
 	def get_matchURL(self):
 		return self.__matchURL
 
+	def get_summonerId(self):
+		return self.__summonerId
+
 
 	#functions
-	def requestSummonerData():
+	def updateUser(self, region, summonerName, apiKey):
+		self.__region = set_region(region)
+		self.__summonerName = set_summonerName(summonerName)
+		self.__apiKey = set_apiKey(apiKey)
+		self.__path = set_path('./')
+		self.__fileName = set_fileName()
+		self.__summonerURL = __get_summonerURL(region, summonerName,apiKey)
+		self.__summonerId = set_summonerId(summonerName)
+		self.__matchURL = __set_matchURL(region, get_summonerId(), apiKey)
+	def requestSummonerData(self):
 		#for later : check if all conditions are met
 		response = requests.get(get_summonerURL())
+		return response.json()
+
+	def requestMatchData(self):
+		#for later : check if all conditions are met
+		response = requests.get(get_matchURL())
+		return response.json()
+
+	#def pushtoJSON()
 
 
 

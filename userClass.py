@@ -100,6 +100,7 @@ class userClass:
 			oldData = {}
 
 		#combining the old file and the new data together
+		#update, had problem with below line of code adding duplicate keys. Need to expirement further
 		#updatedData = {**oldData, **userJSON}
 
 		for players in userJSON:

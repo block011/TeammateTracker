@@ -93,26 +93,36 @@ class userClass:
 
 	def pushToJSON(self,userJSON):
 
-		#Checking if file already exists
-		if(os.path.isfile(self.get_fileName())):
-			oldData = self.getFromJSON()
-		else:
-			oldData = {}
+		#if Botgame just return
+		if userJSON is None:
+			return
 
+		oldData = self.retrieveData()
 		#combining the old file and the new data together
 		#update, had problem with below line of code adding duplicate keys. Need to expirement further
 		#updatedData = {**oldData, **userJSON}
 
 		for players in userJSON:
-			oldData[players] = userJSON[players]
+			if oldData == None:
+				oldData = {}
+			
+			oldData[str(players)] = userJSON[players]
 
 		with open(self.get_fileName(),'w') as fp:
 			json.dump(oldData,fp)
 
+	def retrieveData(self):
+		#Checking if file already exists
+		if(os.path.isfile(self.get_fileName())):
+			oldData = self.getFromJSON()
+		else:
+			oldData = {}
+		return oldData;
+
 	def getParticipants(self):
 
 		now = datetime.datetime.now()
-		currentTime = str(now.strftime("%Y-%m-%d/%H-%S"))
+		self.__currentTime = str(now.strftime("%Y-%m-%d/%H-%S"))
 
 		fullResponse = self.requestMatchData()
 		Participant = {}
@@ -125,21 +135,40 @@ class userClass:
 			if(summoner['bot'] == False and str(summoner['summonerId']) != self.get_summonerId()):
 				
 				#saving all the info under the date in which it was pulled
-				Participant[str(summoner['summonerId'])] = {}
-				Participant[str(summoner['summonerId'])][currentTime] = summoner
+				#Participant[str(summoner['summonerId'])] = []
+
+
 
 				#clear JSON of all junk we don't need
-				del Participant[str(summoner['summonerId'])][currentTime]['perks']
-				del Participant[str(summoner['summonerId'])][currentTime]['gameCustomizationObjects']
-				del Participant[str(summoner['summonerId'])][currentTime]['spell1Id']
-				del Participant[str(summoner['summonerId'])][currentTime]['spell2Id']
-				del Participant[str(summoner['summonerId'])][currentTime]['bot']
-				del Participant[str(summoner['summonerId'])][currentTime]['profileIconId']
-				del Participant[str(summoner['summonerId'])][currentTime]['summonerId']
+				del summoner['perks']
+				del summoner['gameCustomizationObjects']
+				del summoner['spell1Id']
+				del summoner['spell2Id']
+				del summoner['bot']
+				del summoner['profileIconId']
+				summoner['date'] = self.__currentTime
+
+				
+				Participant[str(summoner['summonerId'])]= summoner
 
 		return Participant
 
+	def checkParticipant(self, Participant):
 
+
+		oldData = self.retrieveData()
+
+		#if empty
+		if oldData is None:
+			pass
+
+		#if in old data
+		elif Participant in oldData:
+			print("found player")
+			print(oldData[Participant])
+			#else
+		else:
+			print("not found")
 
 
 	def __init__(self, region, summonerName, apiKey):
@@ -151,4 +180,5 @@ class userClass:
 		self.__set_summonerURL(region, summonerName,apiKey)
 		self.set_summonerId(summonerName)
 		self.__set_matchURL(region, self.get_summonerId(), apiKey)
+		self.__currentTime = 0
 

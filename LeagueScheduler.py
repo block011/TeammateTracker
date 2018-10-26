@@ -1,4 +1,8 @@
-from userClass import userClass 
+import psutil
+import schedule
+import time
+
+from userClass import *
 
 class LeagueScheduler:
 
@@ -12,7 +16,7 @@ class LeagueScheduler:
 
 	#Getters
 	def get_processName(self):
-		return self.__process
+		return self.__processName
 
 	def get_inGame(self):
 		return self.__inGame
@@ -27,17 +31,24 @@ class LeagueScheduler:
 			return True
 		return False
 
-	def checkProcess():
+	def checkProcess(self):
 
-		if(isProcessRunning(self)):
-			print("FoundProcess")
-			#response = user.getParticipants
-			#for user in response:
-			#	user.pushToJSON(response[user])
+		#finds process once and doesnt run again until next
+		if(self.isProcessRunning() and self.get_inGame()):
+			pass		
+		elif(self.isProcessRunning()):
+			self.__set_inGame(True)
+			participants = self.__user.getParticipants()
+			for summoner in participants:
+
+				self.__user.checkParticipant(summoner)
+
+			self.__user.pushToJSON(participants)
 		else:
-			print("didNotFindProcess")
+			self.__set_inGame(False)
+			False
 	
 	def __init__(self,userClass):
-		set_processName("League of Legends.exe")
-		updateUser(user)
-		__set_inGame(False)
+		self.set_processName("League of Legends.exe")
+		self.updateUser(userClass)
+		self.__set_inGame(False)

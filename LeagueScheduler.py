@@ -46,7 +46,6 @@ class LeagueScheduler:
 			self.__user.pushToJSON(participants)
 		else:
 			self.__set_inGame(False)
-			False
 	
 	def __init__(self,userClass):
 		self.set_processName("League of Legends.exe")
